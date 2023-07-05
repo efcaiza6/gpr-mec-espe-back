@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'gpr-decem-espe'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3C1B118A56424F22A7DC2D954F1298DE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB276897CD6944F0BCA3CA59442C1AF9 }}
           package: '*.jar'
