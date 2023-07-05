@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "gpr.storage.base-url",
+  "type": "java.lang.String",
+  "description": "URL del microservicio de GPRStorage'"
+}]}
