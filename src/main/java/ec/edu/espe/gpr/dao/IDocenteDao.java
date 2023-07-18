@@ -14,4 +14,5 @@ public interface IDocenteDao extends JpaRepository<Docente, Integer> {
     Docente findByNombreDocente(String nombreDocente);
     Docente findByCorreoDocente(String nombreDocente);
     Docente findByCedulaDocente(String cedulaDocente);
+    Docente findByIdDocente(String idDocente);
 }
