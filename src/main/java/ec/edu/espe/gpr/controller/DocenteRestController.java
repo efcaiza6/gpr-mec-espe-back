@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins= {
+@CrossOrigin(origins = {
 		"https://yellow-river-0ca1d1510.3.azurestaticapps.net",
 		"http://localhost:4200",
 		"http://localhost:8088"
@@ -25,41 +25,41 @@ import java.util.List;
 public class DocenteRestController {
 	@Autowired
 	private IDocenteService docenteservice;
-	private IDocenteDao dao;
-	
+
 	@GetMapping("/usuarionombre/{id}")
-	public ResponseEntity<DocenteResponseRest> buscarUsuarios(@PathVariable String id){
-		ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.buscarPorUsuario(id);
+	public ResponseEntity<DocenteResponseRest> buscarUsuarios(@PathVariable String id) {
+		ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.buscarPorUsuario(id);
 		return responseEntity;
 	}
+
 	@GetMapping("/usuarioid/{id}")
-	public ResponseEntity<DocenteResponseRest> buscarporId(@PathVariable String id){
-		ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.buscarPorIDEspe(id);
+	public ResponseEntity<DocenteResponseRest> buscarporId(@PathVariable String id) {
+		ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.buscarPorIDEspe(id);
 		return responseEntity;
 	}
-	
+
 	@GetMapping("/docente")
-	public ResponseEntity<DocenteResponseRest> searchUsuarios(){
+	public ResponseEntity<DocenteResponseRest> searchUsuarios() {
 		try {
-			ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.serach();
+			ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.serach();
 			return responseEntity;
-		}catch(Exception c) {
+		} catch (Exception c) {
 			return null;
 		}
 	}
 
 	@GetMapping("/docente/{idDocente}")
-	public ResponseEntity<Docente> buscarporIdDocente(@PathVariable String idDocente){
-		Docente docente = dao.findByIdDocente(idDocente);
-		return ResponseEntity.ok(docente);
+	public ResponseEntity<DocenteResponseRest> buscarporIdDocente(@PathVariable String idDocente) {
+		ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.buscarPorIdDocente(idDocente);
+		return responseEntity;
 	}
-	
+
 	@GetMapping("/docentePerfilU")
-	public ResponseEntity<DocenteResponseRest> buscarUsuarioPerfil(){
+	public ResponseEntity<DocenteResponseRest> buscarUsuarioPerfil() {
 		try {
-			ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.serachPorPerfil();
+			ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.serachPorPerfil();
 			return responseEntity;
-		}catch(Exception c) {
+		} catch (Exception c) {
 			return null;
 		}
 	}
@@ -76,23 +76,23 @@ public class DocenteRestController {
 
 	@PostMapping("/docentes")
 	public ResponseEntity<DocenteResponseRest> saveDocentes(
-			
+
 			@RequestParam("idDocente") String idDocente,
 			@RequestParam("nombreDocente") String nombreDocente,
 			@RequestParam("apellidoDocente") String apellidoDocente,
-			@RequestParam("cedulaDocente")String cedulaDocente ,
+			@RequestParam("cedulaDocente") String cedulaDocente,
 			@RequestParam("telefonoDocente") String telefonoDocente,
-			@RequestParam("correoDocente")String correoDocente ,
-			@RequestParam("sexooDocente")String sexooDocente,
-			@RequestParam("puestoDocente")String puestoDocente,
-			@RequestParam("cargosAsignados") String strCargosAsignados
-			){
+			@RequestParam("correoDocente") String correoDocente,
+			@RequestParam("sexooDocente") String sexooDocente,
+			@RequestParam("puestoDocente") String puestoDocente,
+			@RequestParam("cargosAsignados") String strCargosAsignados) {
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
-        List<Cargo> cargos = gson.fromJson(strCargosAsignados, new TypeToken<List<Cargo>>(){}.getType());
+		List<Cargo> cargos = gson.fromJson(strCargosAsignados, new TypeToken<List<Cargo>>() {
+		}.getType());
 
-		Docente docente =new Docente();
-		
+		Docente docente = new Docente();
+
 		docente.setIdDocente(idDocente);
 		docente.setNombreDocente(nombreDocente);
 		docente.setApellidoDocente(apellidoDocente);
@@ -101,27 +101,27 @@ public class DocenteRestController {
 		docente.setCorreoDocente(correoDocente);
 		docente.setSexo(sexooDocente);
 		docente.setPuestoTrabajoDocente(puestoDocente);
-		
-		
-		ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.save(docente,cargos);
+
+		ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.save(docente, cargos);
 		return responseEntity;
 	}
-	
+
 	@PutMapping("/updatedocente/{id}")
-	public ResponseEntity<DocenteResponseRest> updateCategories(@RequestBody Docente docente,@PathVariable Integer id){
-		ResponseEntity<DocenteResponseRest> responseEntity=docenteservice.update(docente, id);
+	public ResponseEntity<DocenteResponseRest> updateCategories(@RequestBody Docente docente,
+			@PathVariable Integer id) {
+		ResponseEntity<DocenteResponseRest> responseEntity = docenteservice.update(docente, id);
 		return responseEntity;
 	}
-	
+
 	@PutMapping("/resetearPassword")
-	public ResponseEntity<String> resetearPassword(@RequestBody String email){
+	public ResponseEntity<String> resetearPassword(@RequestBody String email) {
 		try {
-            this.docenteservice.resetearPassword(email);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
+			this.docenteservice.resetearPassword(email);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		}
 	}
-	
+
 }

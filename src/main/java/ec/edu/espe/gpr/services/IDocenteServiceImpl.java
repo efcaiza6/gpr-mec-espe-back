@@ -27,12 +27,9 @@ import ec.edu.espe.gpr.model.Usuario;
 import ec.edu.espe.gpr.model.Usuper;
 import ec.edu.espe.gpr.response.DocenteResponseRest;
 
-
-
-
 @Service
-public class IDocenteServiceImpl implements IDocenteService  {
-	
+public class IDocenteServiceImpl implements IDocenteService {
+
 	@Autowired
 	private IDocenteDao docenteDao;
 	@Autowired
@@ -41,72 +38,73 @@ public class IDocenteServiceImpl implements IDocenteService  {
 	private ICargoDao cargoDao;
 	@Autowired
 	private IUsuarioDao usuarioDao;
-    @Autowired
+	@Autowired
 	private CargoDocenteDao cargoDocenteDao;
 	@Autowired
 	private IEmailService emservice;
-	
+
 	@Transactional
 	@Override
 	public ResponseEntity<DocenteResponseRest> save(Docente docente, List<Cargo> cargos) {
-		
+
 		PasswordEncoder passeconder;
-		passeconder=new BCryptPasswordEncoder();
-		DocenteResponseRest response= new DocenteResponseRest();
-		List<Docente> list= new ArrayList<>();
+		passeconder = new BCryptPasswordEncoder();
+		DocenteResponseRest response = new DocenteResponseRest();
+		List<Docente> list = new ArrayList<>();
 		try {
-			/*Optional<Cargo> cargo=cargoDao.findById(id);
-			if(cargo.isPresent()) {
-				//docente.setCodCargo(cargo.get());
-			}else {
-				response.setMetadata("Respuesta nok", "-1", "No se encontro la categoria");
-				return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.NOT_FOUND);
-				
-			}*/
-			
-			Usuario usuario =new Usuario();
-			Long idLoc=usuarioDao.count()+1;
+			/*
+			 * Optional<Cargo> cargo=cargoDao.findById(id);
+			 * if(cargo.isPresent()) {
+			 * //docente.setCodCargo(cargo.get());
+			 * }else {
+			 * response.setMetadata("Respuesta nok", "-1", "No se encontro la categoria");
+			 * return new
+			 * ResponseEntity<DocenteResponseRest>(response,HttpStatus.NOT_FOUND);
+			 * 
+			 * }
+			 */
+
+			Usuario usuario = new Usuario();
+			Long idLoc = usuarioDao.count() + 1;
 			usuario.setCodigoUsuario(idLoc.intValue());
 			String[] parts = docente.getApellidoDocente().split(" ");
-			String nombreUsuario=(docente.getNombreDocente().substring(0,1).concat(parts[0])).toLowerCase();
-			nombreUsuario=nombreUsuario.replace("ñ","n");
-			
-			
+			String nombreUsuario = (docente.getNombreDocente().substring(0, 1).concat(parts[0])).toLowerCase();
+			nombreUsuario = nombreUsuario.replace("ñ", "n");
+
 			nombreUsuario = Normalizer.normalize(nombreUsuario, Normalizer.Form.NFD);
-			nombreUsuario = nombreUsuario.replaceAll("[^\\p{ASCII}]","");
-			//Usuario repetido
-			String usuariotemp=nombreUsuario;
-			
-			for(int i=1; i!=0;i++) {
-				
-				if(usuariosRepetido(nombreUsuario)==0) {
+			nombreUsuario = nombreUsuario.replaceAll("[^\\p{ASCII}]", "");
+			// Usuario repetido
+			String usuariotemp = nombreUsuario;
+
+			for (int i = 1; i != 0; i++) {
+
+				if (usuariosRepetido(nombreUsuario) == 0) {
 					break;
-					
-				}else {
-					
-					String numeroUsuario=Integer.toString(i);			
-					nombreUsuario=usuariotemp.concat(numeroUsuario);			
+
+				} else {
+
+					String numeroUsuario = Integer.toString(i);
+					nombreUsuario = usuariotemp.concat(numeroUsuario);
 				}
-			
+
 			}
-			
+
 			System.out.println(nombreUsuario);
-						
+
 			usuario.setNombreUsuario(nombreUsuario);
 
-			
 			usuario.setPasswUsuario(passeconder.encode(docente.getCedulaDocente()));
 			usuario.setFechaCreUsu(new Date());
 			usuario.setFechaModUsuario(new Date());
 			usuario.setEstadoUsuario('0');
 			usuarioDao.save(usuario);
-			
-			Long idLocDoc=docenteDao.count()+1;
-			
+
+			Long idLocDoc = docenteDao.count() + 1;
+
 			docente.setCodigoDocente(idLocDoc.intValue());
 			docente.setCodigoUsuario(usuario);
-			Docente docentesave=docenteDao.save(docente);
-			
+			Docente docentesave = docenteDao.save(docente);
+
 			for (Cargo cargo : cargos) {
 				CargoDocente cargoDocente = new CargoDocente();
 				cargoDocente.setCodCargo(cargo);
@@ -114,149 +112,138 @@ public class IDocenteServiceImpl implements IDocenteService  {
 				cargoDocente.setFechaActCargoDocente(new Date());
 				this.cargoDocenteDao.save(cargoDocente);
 			}
-			if(docentesave!=null) {
+			if (docentesave != null) {
 				list.add(docentesave);
-				
+
 				response.getDocenteResponse().setDocente(list);
 				response.setMetadata("Respuesta 0k", "000", "Respuesta exitosa");
-				}else {
-					response.setMetadata("Respuesta nok", "000", "Error docente no guardado");
-					return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.BAD_REQUEST);
-				}
-			
-			
-		}catch(Exception e) {
+			} else {
+				response.setMetadata("Respuesta nok", "000", "Error docente no guardado");
+				return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (Exception e) {
 			response.setMetadata("Respuesta nok", "000", "Error al guardar el docente");
 			e.getStackTrace();
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
-		}
-		
-		
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
-	}
-	
-	
-	private int usuariosRepetido(String usuario) {
-		int resp=0;
-		
-		List<Usuario> list= new ArrayList<>();
-		
-		list=(List<Usuario>)usuarioDao.findAll();
-		
-		for(Usuario u : list) {
-			
-			if(usuario.equals(u.getNombreUsuario())) {
-				resp=1;
-			}			
-		}
-		
-		return resp;
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
 
-	
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
+	}
+
+	private int usuariosRepetido(String usuario) {
+		int resp = 0;
+
+		List<Usuario> list = new ArrayList<>();
+
+		list = (List<Usuario>) usuarioDao.findAll();
+
+		for (Usuario u : list) {
+
+			if (usuario.equals(u.getNombreUsuario())) {
+				resp = 1;
+			}
+		}
+
+		return resp;
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public ResponseEntity<DocenteResponseRest> serach() {
-		DocenteResponseRest response= new DocenteResponseRest();
+		DocenteResponseRest response = new DocenteResponseRest();
 		try {
-			List<Docente> usuarioperfil= (List<Docente>) docenteDao.findAll();
-			
+			List<Docente> usuarioperfil = (List<Docente>) docenteDao.findAll();
+
 			response.getDocenteResponse().setDocente(usuarioperfil);
 			response.setMetadata("Respuesta 0k", "200", "Respuesta exitosa");
-			
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			// TODO: handle exception
 			response.setMetadata("Respuesta nok", "000", "Error Consultar");
 			e.getStackTrace();
 			System.out.println("Sale");
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public ResponseEntity<DocenteResponseRest> serachPorPerfil() {
-		DocenteResponseRest response= new DocenteResponseRest();
+		DocenteResponseRest response = new DocenteResponseRest();
 		try {
 			boolean bandera;
-			List<Docente> usuarioperfil= (List<Docente>) docenteDao.findAll();
-			
-			List<Usuper> usuarioperfilP= (List<Usuper>) usuarioperfilDao.findAll();
-			
-			List<Docente> docentes=new ArrayList<>();
-			for(Docente d: usuarioperfil) {
-				bandera=false;
-				
-				for(Usuper up:usuarioperfilP) {
-					if(up.getCodigoUsuario().getCodigoUsuario()==d.getCodigoUsuario().getCodigoUsuario()) {
-						bandera=true;
-						
+			List<Docente> usuarioperfil = (List<Docente>) docenteDao.findAll();
+
+			List<Usuper> usuarioperfilP = (List<Usuper>) usuarioperfilDao.findAll();
+
+			List<Docente> docentes = new ArrayList<>();
+			for (Docente d : usuarioperfil) {
+				bandera = false;
+
+				for (Usuper up : usuarioperfilP) {
+					if (up.getCodigoUsuario().getCodigoUsuario() == d.getCodigoUsuario().getCodigoUsuario()) {
+						bandera = true;
+
 					}
 				}
-				if(bandera!=true) {
+				if (bandera != true) {
 					docentes.add(d);
-				}	
-				
+				}
+
 			}
-			
+
 			response.getDocenteResponse().setDocente(docentes);
 			response.setMetadata("Respuesta 0k", "200", "Respuesta exitosa");
-			
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			// TODO: handle exception
 			response.setMetadata("Respuesta nok", "000", "Error Consultar");
 			e.getStackTrace();
 			System.out.println("Sale");
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
-	
-	
 
 	@Override
 	public ResponseEntity<DocenteResponseRest> buscarPorUsuario(String usuario) {
-		DocenteResponseRest response= new DocenteResponseRest();
+		DocenteResponseRest response = new DocenteResponseRest();
 		try {
-			List<Docente> usuarioperfil= (List<Docente>) docenteDao.findAll();
-			List<Docente> docenteList= new ArrayList<>();
-			for(Docente d: usuarioperfil) {
-				if(d.getCodigoUsuario().getNombreUsuario().equals(usuario)){
+			List<Docente> usuarioperfil = (List<Docente>) docenteDao.findAll();
+			List<Docente> docenteList = new ArrayList<>();
+			for (Docente d : usuarioperfil) {
+				if (d.getCodigoUsuario().getNombreUsuario().equals(usuario)) {
 					docenteList.add(d);
 					response.getDocenteResponse().setDocente(docenteList);
 					response.setMetadata("Respuesta 0k", "200", "Respuesta exitosa");
-					
+
 				}
 			}
-			
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			// TODO: handle exception
 			response.setMetadata("Respuesta nok", "000", "Error Consultar");
 			e.getStackTrace();
 			System.out.println("Sale");
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
-
-
 
 	@Override
 	public ResponseEntity<DocenteResponseRest> buscarPorIDEspe(String idespe) {
-		DocenteResponseRest response= new DocenteResponseRest();
+		DocenteResponseRest response = new DocenteResponseRest();
 		try {
-			List<Docente> usuarioperfil= (List<Docente>) docenteDao.findAll();
-			List<Docente> docenteList= new ArrayList<>();
-			for(Docente d: usuarioperfil) {
-				if(d.getCedulaDocente().equals(idespe)){
+			List<Docente> usuarioperfil = (List<Docente>) docenteDao.findAll();
+			List<Docente> docenteList = new ArrayList<>();
+			for (Docente d : usuarioperfil) {
+				if (d.getCedulaDocente().equals(idespe)) {
 					docenteList.add(d);
 					response.getDocenteResponse().setDocente(docenteList);
 					response.setMetadata("Respuesta 0k", "200", "Respuesta exitosa");
@@ -264,66 +251,90 @@ public class IDocenteServiceImpl implements IDocenteService  {
 				}
 			}
 
-
-		}catch (Exception e) {
+		} catch (Exception e) {
 			// TODO: handle exception
 			response.setMetadata("Respuesta nok", "000", "Error Consultar");
 			e.getStackTrace();
 			System.out.println("Sale");
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
 
-	public Docente buscarPorCedulaDocente(String cedulaDocente){
+	@Override
+	public ResponseEntity<DocenteResponseRest> buscarPorIdDocente(String idDocente) {
+		DocenteResponseRest response = new DocenteResponseRest();
+		try {
+			List<Docente> usuarioperfil = (List<Docente>) docenteDao.findAll();
+			List<Docente> docenteList = new ArrayList<>();
+			for (Docente d : usuarioperfil) {
+				if (d.getIdDocente().equals(idDocente)) {
+					docenteList.add(d);
+					response.getDocenteResponse().setDocente(docenteList);
+					response.setMetadata("Respuesta 0k", "200", "Respuesta exitosa");
+
+				}
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			response.setMetadata("Respuesta nok", "000", "Error Consultar");
+			e.getStackTrace();
+			System.out.println("Sale");
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
+	}
+
+	public Docente buscarPorCedulaDocente(String cedulaDocente) {
 		return this.docenteDao.findByCedulaDocente(cedulaDocente);
 	}
 
 	@Override
 	public ResponseEntity<DocenteResponseRest> update(Docente docente, Integer id) {
-		DocenteResponseRest response= new DocenteResponseRest();
+		DocenteResponseRest response = new DocenteResponseRest();
 
-		List<Docente> list= new ArrayList<>();
+		List<Docente> list = new ArrayList<>();
 		try {
-			Optional<Docente> usuarioF=docenteDao.findById(id);
-			if(usuarioF.isPresent()) {
-				
+			Optional<Docente> usuarioF = docenteDao.findById(id);
+			if (usuarioF.isPresent()) {
+
 				usuarioF.get().setCodigoDocente(docente.getCodigoDocente());
-			    usuarioF.get().setIdDocente(docente.getIdDocente());
-			    usuarioF.get().setNombreDocente(docente.getNombreDocente());
-			    usuarioF.get().setApellidoDocente(docente.getApellidoDocente());
-			    usuarioF.get().setCedulaDocente(docente.getCedulaDocente());
-			    usuarioF.get().setTelefonoDocente(docente.getTelefonoDocente());
-			    usuarioF.get().setCorreoDocente(docente.getCorreoDocente());
-			    usuarioF.get().setSexo(docente.getSexo());
-			    usuarioF.get().setPuestoTrabajoDocente(docente.getPuestoTrabajoDocente());
-			    usuarioF.get().setCorreoDocente(docente.getCorreoDocente());
-			    //usuarioF.get().setCodCargo(docente.getCodCargo());
-			}else {
+				usuarioF.get().setIdDocente(docente.getIdDocente());
+				usuarioF.get().setNombreDocente(docente.getNombreDocente());
+				usuarioF.get().setApellidoDocente(docente.getApellidoDocente());
+				usuarioF.get().setCedulaDocente(docente.getCedulaDocente());
+				usuarioF.get().setTelefonoDocente(docente.getTelefonoDocente());
+				usuarioF.get().setCorreoDocente(docente.getCorreoDocente());
+				usuarioF.get().setSexo(docente.getSexo());
+				usuarioF.get().setPuestoTrabajoDocente(docente.getPuestoTrabajoDocente());
+				usuarioF.get().setCorreoDocente(docente.getCorreoDocente());
+				// usuarioF.get().setCodCargo(docente.getCodCargo());
+			} else {
 				response.setMetadata("Respuesta nok", "-1", "No se encontro el usuario");
-				return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.NOT_FOUND);
+				return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.NOT_FOUND);
 			}
-	
-			Docente usuuariosave=docenteDao.save(usuarioF.get());
+
+			Docente usuuariosave = docenteDao.save(usuarioF.get());
 			int indice;
 			List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByCodigoDocente(usuuariosave);
-			List<Cargo> cargos= new ArrayList<>();
-			
+			List<Cargo> cargos = new ArrayList<>();
+
 			for (CargoDocente cargoDocente : docente.getCargoDocenteList()) {
 				cargos.add(cargoDocente.getCodCargo());
 			}
-			
+
 			for (CargoDocente cargoDocente : cargoDocentes) {
 				indice = cargos.indexOf(cargoDocente.getCodCargo());
-				if(indice == -1){
+				if (indice == -1) {
 					this.cargoDocenteDao.delete(cargoDocente);
-				}
-				else
+				} else
 					cargos.remove(indice);
 			}
 
-			if(cargos.size() > 0){
+			if (cargos.size() > 0) {
 				for (Cargo cargo : cargos) {
 					CargoDocente cargoDocente = new CargoDocente();
 					cargoDocente.setCodCargo(cargo);
@@ -332,30 +343,29 @@ public class IDocenteServiceImpl implements IDocenteService  {
 					this.cargoDocenteDao.save(cargoDocente);
 				}
 			}
-			
-			if(usuuariosave!=null) {
-				
+
+			if (usuuariosave != null) {
+
 				list.add(usuuariosave);
-				
+
 				response.getDocenteResponse().setDocente(list);
 				response.setMetadata("Respuesta 0k", "000", "Respuesta exitosa");
-				}else {
-					response.setMetadata("Respuesta nok", "000", "Error usuario no guardado");
-					return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.BAD_REQUEST);
-				}
-			
-			
-		}catch(Exception e) {
+			} else {
+				response.setMetadata("Respuesta nok", "000", "Error usuario no guardado");
+				return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (Exception e) {
 			response.setMetadata("Respuesta nok", "000", "Error al guardar el usuario");
 			e.getStackTrace();
-			return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			
+			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
-		return new ResponseEntity<DocenteResponseRest>(response,HttpStatus.OK);
+		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
 
 	@Override
-	public void resetearPassword(String email){
+	public void resetearPassword(String email) {
 		PasswordEncoder passeconder = new BCryptPasswordEncoder();
 		Docente docente = this.docenteDao.findByCorreoDocente(email);
 		String password = this.generateRandomPassword(10);
@@ -364,28 +374,22 @@ public class IDocenteServiceImpl implements IDocenteService  {
 		docente.getCodigoUsuario().setEstadoUsuario('2');
 		this.usuarioDao.save(docente.getCodigoUsuario());
 		emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Cambio de Contraseña: ",
-							"Se ha solicitado el cambio de su contraseña, Su usuario es: "+docente.getCodigoUsuario().getNombreUsuario() + 
-                            ", y su password:"+password);
-		
+				"Se ha solicitado el cambio de su contraseña, Su usuario es: "
+						+ docente.getCodigoUsuario().getNombreUsuario() +
+						", y su password:" + password);
+
 	}
-	
-	private String generateRandomPassword(int len)
-    {
-        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	private String generateRandomPassword(int len) {
+		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder();
- 
-        for (int i = 0; i < len; i++)
-        {
-            int randomIndex = random.nextInt(chars.length());
-            sb.append(chars.charAt(randomIndex));
-        }
-        return sb.toString();
-    }
- 
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < len; i++) {
+			int randomIndex = random.nextInt(chars.length());
+			sb.append(chars.charAt(randomIndex));
+		}
+		return sb.toString();
+	}
 
 }
-
-	
-	
-
