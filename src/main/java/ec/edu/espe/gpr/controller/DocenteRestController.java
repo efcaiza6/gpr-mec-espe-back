@@ -3,6 +3,8 @@ package ec.edu.espe.gpr.controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import ec.edu.espe.gpr.dao.IDocenteDao;
 import ec.edu.espe.gpr.model.Cargo;
 import ec.edu.espe.gpr.model.Docente;
 import ec.edu.espe.gpr.response.DocenteResponseRest;
@@ -23,6 +25,7 @@ import java.util.List;
 public class DocenteRestController {
 	@Autowired
 	private IDocenteService docenteservice;
+	private IDocenteDao dao;
 	
 	@GetMapping("/usuarionombre/{id}")
 	public ResponseEntity<DocenteResponseRest> buscarUsuarios(@PathVariable String id){
@@ -43,6 +46,12 @@ public class DocenteRestController {
 		}catch(Exception c) {
 			return null;
 		}
+	}
+
+	@GetMapping("/docente/{idDocente}")
+	public ResponseEntity<Docente> buscarporIdDocente(@PathVariable String idDocente){
+		Docente docente = dao.findByIdDocente(idDocente);
+		return ResponseEntity.ok(docente);
 	}
 	
 	@GetMapping("/docentePerfilU")
