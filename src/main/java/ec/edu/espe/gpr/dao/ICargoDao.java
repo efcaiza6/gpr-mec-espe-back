@@ -9,4 +9,5 @@ import ec.edu.espe.gpr.model.Cargo;
 
 public interface ICargoDao extends JpaRepository<Cargo, String>{
     public List<Cargo> findAllByOrderByNombreCargoAsc();
+    Cargo findByNombreCargo(String nombreCargo);
 }

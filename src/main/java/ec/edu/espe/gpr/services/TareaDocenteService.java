@@ -224,6 +224,17 @@ public class TareaDocenteService {
         return docentes.stream().sorted(Comparator.comparing(Docente::getApellidoDocente)).collect(Collectors.toList());// this.docenteDao.findByCodCargo(cargo);
     }
 
+    public List<Docente> listarTodosDocentesPorNombreCargo(String nombreCargo) {
+        Cargo cargo = this.cargoDao.findByNombreCargo(nombreCargo);
+        List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByCodCargo(cargo);
+        List<Docente> docentes = new ArrayList<>();
+        for (CargoDocente cargoDocente : cargoDocentes) {
+            docentes.add(cargoDocente.getCodigoDocente());
+        }
+        return docentes.stream().sorted(Comparator.comparing(Docente::getApellidoDocente)).collect(Collectors.toList());// this.docenteDao.findByCodCargo(cargo);
+    }
+
+
     public Docente obtenerDocentePorCodigoDocente(Integer codigoDocente) {
         Optional<Docente> docenteOpt = this.docenteDao.findByCodigoDocente(codigoDocente);
         if (docenteOpt.isPresent())
