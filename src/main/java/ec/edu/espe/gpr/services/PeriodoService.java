@@ -39,6 +39,7 @@ public class PeriodoService {
 	
     public void crear(Periodo periodo) {
         periodo.setNombrePeriodo(periodo.getNombrePeriodo().toUpperCase());
+        periodo.setDescripcionPeriodo(periodo.getDescripcionPeriodo().toUpperCase());
         periodo.setEstadoPeriodo(EstadoPeriodoEnum.ACTIVE.getValue());
         periodo.setFechaCreacionPeriodo(new Date());
         periodo.setFechaModificacionPeriodo(new Date());
@@ -47,8 +48,7 @@ public class PeriodoService {
 
     public Periodo modificarDatos(Periodo periodo) {
         periodo.setNombrePeriodo(periodo.getNombrePeriodo().toUpperCase());
-        periodo.setEstadoPeriodo(EstadoPeriodoEnum.ACTIVE.getValue());
-        periodo.setFechaCreacionPeriodo(new Date());
+        periodo.setDescripcionPeriodo(periodo.getDescripcionPeriodo().toUpperCase());
         periodo.setFechaModificacionPeriodo(new Date());
         periodo= this.periodoDao.save(periodo);
         return periodo;
