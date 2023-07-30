@@ -60,6 +60,7 @@ public class PeriodoService {
             periodoDB.setEstadoPeriodo(EstadoPeriodoEnum.INACTIVE.getValue());
         else
             periodoDB.setEstadoPeriodo(EstadoPeriodoEnum.ACTIVE.getValue());
+        periodoDB.setFechaModificacionPeriodo(new Date());
         periodoDB= this.periodoDao.save(periodoDB);
         return periodoDB;
     }
