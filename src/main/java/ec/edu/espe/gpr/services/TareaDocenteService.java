@@ -181,15 +181,15 @@ public class TareaDocenteService {
     }
 
     public List<Docente> listarDocentesLikeNombreCargo(String likeNombreCargo, Integer codigoDocente) {
-        List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByCodCargoNombreCargoContainingIgnoreCase(likeNombreCargo);
+        //List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByCodCargoNombreCargoContainingIgnoreCase(likeNombreCargo);
         List<Docente> docentes = new ArrayList<>();
-        for (CargoDocente cargoDocente : cargoDocentes) {
+        /*for (CargoDocente cargoDocente : cargoDocentes) {
             if(!docentes.contains(cargoDocente.getCodigoDocente())) {
                 if (cargoDocente.getCodigoDocente().getCodigoDocente() != codigoDocente) {
                     docentes.add(cargoDocente.getCodigoDocente());
                 }
             }
-        }
+        }*/
         return docentes.stream().sorted(Comparator.comparing(Docente::getApellidoDocente)).collect(Collectors.toList());
     }
 
