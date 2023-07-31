@@ -180,6 +180,19 @@ public class TareaDocenteService {
         return this.tareaDocenteDao.findByCodigoTarea(tarea);
     }
 
+    public List<Docente> listarDocentesLikeNombreCargo(String likeNombreCargo, Integer codigoDocente) {
+        List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByNombreCargoContainingIgnoreCase(likeNombreCargo);
+        List<Docente> docentes = new ArrayList<>();
+        for (CargoDocente cargoDocente : cargoDocentes) {
+            if(!docentes.contains(cargoDocente.getCodigoDocente())) {
+                if (cargoDocente.getCodigoDocente().getCodigoDocente() != codigoDocente) {
+                    docentes.add(cargoDocente.getCodigoDocente());
+                }
+            }
+        }
+        return docentes.stream().sorted(Comparator.comparing(Docente::getApellidoDocente)).collect(Collectors.toList());
+    }
+
     public List<Docente> obtenerDocentesPorCargo(String codigoCargo, Integer codigoDocente) {
         Cargo cargo = this.obtenerCargoPorCodigoCargo(codigoCargo);
         // Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);

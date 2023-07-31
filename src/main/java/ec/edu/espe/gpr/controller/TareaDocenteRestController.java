@@ -126,6 +126,16 @@ public class TareaDocenteRestController {
         }
     }
 
+    @GetMapping(path = "/listarDocentesLikeNombreCargo/{likeNombreCargo}/{codigoDocente}")
+    public ResponseEntity<List<Docente>> listarDocentesLikeNombreCargo(@PathVariable String likeNombreCargo,@PathVariable Integer codigoDocente) {
+        try {
+            List<Docente> docentes = this.tareaDocenteService.listarDocentesLikeNombreCargo(likeNombreCargo,codigoDocente);
+            return ResponseEntity.ok(docentes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping(path = "/listarDocentesPorCargo/{codigoCargo}/{codigoDocente}")
     public ResponseEntity<List<Docente>> listarDocentesPorCargo(@PathVariable String codigoCargo,@PathVariable Integer codigoDocente) {
         try {
