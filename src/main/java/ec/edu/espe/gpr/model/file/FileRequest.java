@@ -1,28 +1,40 @@
 package ec.edu.espe.gpr.model.file;
 
-import org.springframework.web.multipart.MultipartFile;
-
 public class FileRequest {
 
-    private MultipartFile file;
+    private String fileBase64;
     private String nameFile;
-    
-    public FileRequest(MultipartFile file, String nameFile) {
-        this.file = file;
+    private String previousNameFile;
+
+    public FileRequest(String fileBase64, String nameFile) {
+        this.fileBase64 = fileBase64;
         this.nameFile = nameFile;
     }
+
     public FileRequest() {
     }
-    public MultipartFile getFile() {
-        return file;
+
+    public String getFileBase64() {
+        return fileBase64;
     }
-    public void setFile(MultipartFile file) {
-        this.file = file;
+
+    public void setFileBase64(String fileBase64) {
+        this.fileBase64 = fileBase64;
     }
+
     public String getNameFile() {
         return nameFile;
     }
+
     public void setNameFile(String nameFile) {
         this.nameFile = nameFile;
+    }
+
+    public String getPreviousNameFile() {
+        return previousNameFile;
+    }
+
+    public void setPreviousNameFile(String previousNameFile) {
+        this.previousNameFile = previousNameFile;
     }
 }

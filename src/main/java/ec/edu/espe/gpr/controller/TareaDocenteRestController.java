@@ -347,7 +347,7 @@ public class TareaDocenteRestController {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm").create();
             TareaDocenteProyecto tareaDocenteProyecto = gson.fromJson(strTareaDocenteProyecto, TareaDocenteProyecto.class);
-            this.tareaDocenteService.crear(tareaDocenteProyecto,file);
+            this.tareaDocenteService.modificarDatos(tareaDocenteProyecto,file);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();

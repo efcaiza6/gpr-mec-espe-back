@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ec.edu.espe.gpr.dto.TareaDocenteDto;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -624,10 +625,10 @@ public class TareaDocenteService {
             tarea.setArchivoTarea(tarea.getCodigoTarea().toString() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            /*FileRequest fileRequest = new FileRequest(file, tarea.getArchivoTarea());
+            FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getArchivoTarea());
             this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
-                    FileRequest.class);*/
+                    FileRequest.class);
         }
 
         for (Docente docente : tareaDocenteProyecto.getDocentes()) {
@@ -636,10 +637,15 @@ public class TareaDocenteService {
             t.setCodigoDocente(docente);
             t.setCodigoTarea(tarea);
             t.setCedulaDocenteRevisor(tarea.getIdDocenteRevisor());
-            emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
-                    "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
-                            ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
-
+            /*if(tarea.getTipoTarea().equals("TAREA")) {
+                emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
+                        "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
+                                ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
+            }else{
+                emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Solicitud: " + tarea.getNombreTarea(),
+                        "Se ha asignado una nueva Solicitud de prioridad " + tarea.getPrioridadTarea());
+            }
+             */
             TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
             for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
                 TareaIndicador indicadorBD = new TareaIndicador();
@@ -651,6 +657,17 @@ public class TareaDocenteService {
             }
         }
         return tarea;
+    }
+
+    private String convertBase64(MultipartFile file) {
+        try {
+            byte[] fileBytes = file.getBytes();
+            byte[] encodedBytes = Base64.encodeBase64(fileBytes);
+            return new String(encodedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Tarea> crearTareaProgramada(TareaDocenteProyecto tareaDocenteProyecto, MultipartFile file) {
@@ -724,10 +741,10 @@ public class TareaDocenteService {
                 tarea.setNombreArchivoTarea(file.getOriginalFilename());
                 tarea = this.tareaDao.save(tarea);
 
-               /* FileRequest fileRequest = new FileRequest(file, tarea.getArchivoTarea());
+               FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getArchivoTarea());
                 this.restTemplate.postForObject(
                         baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.INVESTIGACION.getValue(),
-                        fileRequest, FileRequest.class);*/
+                        fileRequest, FileRequest.class);
                 // this.saveFileGuia(file, tarea.getArchivoTarea());
             }
             tareas.add(tarea);
@@ -738,11 +755,12 @@ public class TareaDocenteService {
                 t.setCodigoDocente(docente);
                 t.setCodigoTarea(tarea);
                 t.setCedulaDocenteRevisor(tarea.getIdDocenteRevisor());
+                /*
                 emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
                 tarea.getNombreTarea(),
                 "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
                         ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
-
+                    */
                 TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
                     TareaIndicador indicadorBD = new TareaIndicador();
@@ -815,6 +833,7 @@ public class TareaDocenteService {
 
     public TareaDocente modificarDatos(TareaDocenteProyecto tareaDocenteProyecto, MultipartFile file) {
         Tarea tarea = this.tareaDao.save(tareaDocenteProyecto.getTarea());
+        String previousNameFile = null;
         if (file != null) {
             // try {
             // Files.deleteIfExists(this.rootFileGuia.resolve(tarea.getArchivoTarea()));
@@ -827,11 +846,15 @@ public class TareaDocenteService {
 
             if (i > 0)
                 extensionArchivo = file.getOriginalFilename().toString().substring(i + 1);
+            if(tarea.getArchivoTarea()!=null){
+                previousNameFile = tarea.getArchivoTarea();
+            }
 
             tarea.setArchivoTarea(tarea.getCodigoTarea().toString() + "." + extensionArchivo);
             tarea.setNombreArchivoTarea(file.getOriginalFilename());
             tarea = this.tareaDao.save(tarea);
-            FileRequest fileRequest = new FileRequest(file, tarea.getArchivoTarea());
+            FileRequest fileRequest = new FileRequest(convertBase64(file), tarea.getArchivoTarea());
+            fileRequest.setPreviousNameFile(previousNameFile);
             this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFileGuia/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
                     FileRequest.class);
@@ -917,6 +940,7 @@ public class TareaDocenteService {
     public TareaDocente guardarTareaAsignadaAlProfesor(List<TareaIndicador> tareaIndicadors, MultipartFile file,
             Integer codigoTareaDocente) {
         TareaDocente tareaDocente = this.obtenerIndicadorPorCodigoTareaDocente(codigoTareaDocente);
+        String previousNameFile = null;
         if (file != null) {
             /*
              * String extensionArchivo = "";
@@ -925,13 +949,17 @@ public class TareaDocenteService {
              * if (i > 0)
              * extensionArchivo = file.getOriginalFilename().toString().substring(i+1);
              */
+            if(tareaDocente.getArchivoTareaDocente()!=null){
+                previousNameFile = tareaDocente.getArchivoTareaDocente();
+            }
             tareaDocente.setArchivoTareaDocente(tareaDocente.getCodigoTareaDocente().toString() + ".pdf");// Revisar
             tareaDocente.setNombreArchivoTareaDocente(file.getOriginalFilename());
 
-            /*FileRequest fileRequest = new FileRequest(file, tareaDocente.getArchivoTareaDocente());
+            FileRequest fileRequest = new FileRequest(convertBase64(file), tareaDocente.getArchivoTareaDocente());
+            fileRequest.setPreviousNameFile(previousNameFile);
             this.restTemplate.postForObject(
                     baseURLs.getGprStorageURL() + "/saveFile/" + ModulosEnum.INVESTIGACION.getValue(), fileRequest,
-                    FileRequest.class);*/
+                    FileRequest.class);
             // this.saveFile(file, tareaDocente.getArchivoTareaDocente());
         }
 
@@ -944,10 +972,10 @@ public class TareaDocenteService {
         tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
         this.tareaDao.save(tarea);
         Docente docenteRevisor = this.docenteDao.findByCedulaDocente(tarea.getIdDocenteRevisor());
-        emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
+        /*emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
                 "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
-                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
+                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");*/
 
         return tareaDocente;
     }
@@ -998,9 +1026,9 @@ public class TareaDocenteService {
 
     public void denegarTareaDocente(TareaDocente tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
-        emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
+        /*emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-                "Su Actividad ha sido Denegada: ");
+                "Su Actividad ha sido Denegada: ");*/
         this.tareaDocenteDao.save(tareaDocente);
     }
 
