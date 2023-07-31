@@ -181,7 +181,7 @@ public class TareaDocenteService {
     }
 
     public List<Docente> listarDocentesLikeNombreCargo(String likeNombreCargo, Integer codigoDocente) {
-        List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByNombreCargoContainingIgnoreCase(likeNombreCargo);
+        List<CargoDocente> cargoDocentes = this.cargoDocenteDao.findByCodCargoNombreCargoContainingIgnoreCase(likeNombreCargo);
         List<Docente> docentes = new ArrayList<>();
         for (CargoDocente cargoDocente : cargoDocentes) {
             if(!docentes.contains(cargoDocente.getCodigoDocente())) {
