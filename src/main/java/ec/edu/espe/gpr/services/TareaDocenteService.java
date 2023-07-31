@@ -637,7 +637,7 @@ public class TareaDocenteService {
             t.setCodigoDocente(docente);
             t.setCodigoTarea(tarea);
             t.setCedulaDocenteRevisor(tarea.getIdDocenteRevisor());
-            /*if(tarea.getTipoTarea().equals("TAREA")) {
+            if(tarea.getTipoTarea().equals("TAREA")) {
                 emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " + tarea.getNombreTarea(),
                         "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
                                 ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
@@ -645,7 +645,6 @@ public class TareaDocenteService {
                 emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Solicitud: " + tarea.getNombreTarea(),
                         "Se ha asignado una nueva Solicitud de prioridad " + tarea.getPrioridadTarea());
             }
-             */
             TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
             for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
                 TareaIndicador indicadorBD = new TareaIndicador();
@@ -755,12 +754,11 @@ public class TareaDocenteService {
                 t.setCodigoDocente(docente);
                 t.setCodigoTarea(tarea);
                 t.setCedulaDocenteRevisor(tarea.getIdDocenteRevisor());
-                /*
+
                 emservice.enviarCorreo(docente.getCorreoDocente(), "GPR - Nueva Tarea: " +
                 tarea.getNombreTarea(),
                 "Se ha asignado una nueva tarea de prioridad " + tarea.getPrioridadTarea() +
                         ", y debe ser realizada hasta la fecha de:" + tarea.getFechaEntregaTarea());
-                    */
                 TareaDocente tDocenteBD = this.tareaDocenteDao.save(t);
                 for (Indicador indicador : tareaDocenteProyecto.getIndicadors()) {
                     TareaIndicador indicadorBD = new TareaIndicador();
@@ -972,10 +970,10 @@ public class TareaDocenteService {
         tarea.setEstadoTarea(EstadoTareaEnum.INACTIVE.getValue().charAt(0));
         this.tareaDao.save(tarea);
         Docente docenteRevisor = this.docenteDao.findByCedulaDocente(tarea.getIdDocenteRevisor());
-        /*emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
+        emservice.enviarCorreo(docenteRevisor.getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
                 "La Actividad perteneciente a: " + tareaDocente.getCodigoDocente().getNombreDocente() + " " +
-                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");*/
+                        tareaDocente.getCodigoDocente().getApellidoDocente() + " ha sido enviada y debe ser revisada ");
 
         return tareaDocente;
     }
@@ -1026,9 +1024,9 @@ public class TareaDocenteService {
 
     public void denegarTareaDocente(TareaDocente tareaDocente) {
         tareaDocente.setEstadoTareaDocente(EstadoTareaDocenteEnum.DENEGADO.getValue());
-        /*emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
+        emservice.enviarCorreo(tareaDocente.getCodigoDocente().getCorreoDocente(),
                 "GPR - Actividad: " + tareaDocente.getCodigoTarea().getNombreTarea(),
-                "Su Actividad ha sido Denegada: ");*/
+                "Su Actividad ha sido Denegada: ");
         this.tareaDocenteDao.save(tareaDocente);
     }
 
