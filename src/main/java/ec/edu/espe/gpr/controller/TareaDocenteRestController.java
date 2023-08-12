@@ -196,6 +196,15 @@ public class TareaDocenteRestController {
         }
     }
 
+    @GetMapping(path = "/listarTareasNoAsignadasPorDocente/{codigoDocente}")
+    public ResponseEntity<List<TareaDocente>> listarTareasNoAsignadasPorDocente(@PathVariable Integer codigoDocente) {
+        try {
+            List<TareaDocente> tareaDocente = this.tareaDocenteService.listarTareasNoAsignadasPorDocente(codigoDocente);
+            return ResponseEntity.ok(tareaDocente);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
     @GetMapping(path = "/listarIndicadoresPorTarea/{codigoTareaDocente}")
     public ResponseEntity<List<TareaIndicador>> listarIndicadoresPorTarea(@PathVariable Integer codigoTareaDocente) {
         try {

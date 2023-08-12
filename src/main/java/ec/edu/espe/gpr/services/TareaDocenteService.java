@@ -548,7 +548,14 @@ public class TareaDocenteService {
 
     public List<TareaDocente> listarTareaAsignadaPorDocente(Integer codigoDocente) {
         Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);
-        List<TareaDocente> tareas = this.tareaDocenteDao.findByCodigoDocente(docente);
+        List<TareaDocente> tareas = this.tareaDocenteDao.findByCodigoDocenteAndEstadoTareaDocenteNot(docente,EstadoTareaDocenteEnum.ACEPTADO.getValue());
+        return tareas;
+    }
+
+
+    public List<TareaDocente> listarTareasNoAsignadasPorDocente(Integer codigoDocente) {
+        Docente docente = this.obtenerDocentePorCodigoDocente(codigoDocente);
+        List<TareaDocente> tareas = this.tareaDocenteDao.findByCodigoDocenteAndEstadoTareaDocente(docente,EstadoTareaDocenteEnum.ACEPTADO.getValue());
         return tareas;
     }
 
