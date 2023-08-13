@@ -16,7 +16,4 @@ public interface IUsuarioService {
 	public ResponseEntity<UsuarioResponseRest> update(Usuario usuario,Integer id);
 	public Docente getDocentByCodeUser(Integer codeUser);
 
-	
-			
-
 }

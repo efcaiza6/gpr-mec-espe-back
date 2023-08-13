@@ -69,7 +69,5 @@ public class UsuarioRestController {
 		ResponseEntity<UsuarioResponseRest> responseEntity=usuarioService.update(usuario, id);
 		return responseEntity;
 	}
-	
-	
 }
 

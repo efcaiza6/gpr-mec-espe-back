@@ -52,47 +52,28 @@ public class IDocenteServiceImpl implements IDocenteService {
 		DocenteResponseRest response = new DocenteResponseRest();
 		List<Docente> list = new ArrayList<>();
 		try {
-			/*
-			 * Optional<Cargo> cargo=cargoDao.findById(id);
-			 * if(cargo.isPresent()) {
-			 * //docente.setCodCargo(cargo.get());
-			 * }else {
-			 * response.setMetadata("Respuesta nok", "-1", "No se encontro la categoria");
-			 * return new
-			 * ResponseEntity<DocenteResponseRest>(response,HttpStatus.NOT_FOUND);
-			 * 
-			 * }
-			 */
 
 			Usuario usuario = new Usuario();
 			Long idLoc = usuarioDao.count() + 1;
 			usuario.setCodigoUsuario(idLoc.intValue());
-			String[] parts = docente.getApellidoDocente().split(" ");
+			String[] partesCorreo = docente.getCorreoDocente().split("@");
+			String nombreUsuario = partesCorreo[0];
+			/*String[] parts = docente.getApellidoDocente().split(" ");
 			String nombreUsuario = (docente.getNombreDocente().substring(0, 1).concat(parts[0])).toLowerCase();
 			nombreUsuario = nombreUsuario.replace("ñ", "n");
-
 			nombreUsuario = Normalizer.normalize(nombreUsuario, Normalizer.Form.NFD);
 			nombreUsuario = nombreUsuario.replaceAll("[^\\p{ASCII}]", "");
 			// Usuario repetido
 			String usuariotemp = nombreUsuario;
-
 			for (int i = 1; i != 0; i++) {
-
 				if (usuariosRepetido(nombreUsuario) == 0) {
 					break;
-
 				} else {
-
 					String numeroUsuario = Integer.toString(i);
 					nombreUsuario = usuariotemp.concat(numeroUsuario);
 				}
-
-			}
-
-			System.out.println(nombreUsuario);
-
+			}*/
 			usuario.setNombreUsuario(nombreUsuario);
-
 			usuario.setPasswUsuario(passeconder.encode(docente.getCedulaDocente()));
 			usuario.setFechaCreUsu(new Date());
 			usuario.setFechaModUsuario(new Date());
@@ -100,7 +81,6 @@ public class IDocenteServiceImpl implements IDocenteService {
 			usuarioDao.save(usuario);
 
 			Long idLocDoc = docenteDao.count() + 1;
-
 			docente.setCodigoDocente(idLocDoc.intValue());
 			docente.setCodigoUsuario(usuario);
 			Docente docentesave = docenteDao.save(docente);
@@ -114,38 +94,29 @@ public class IDocenteServiceImpl implements IDocenteService {
 			}
 			if (docentesave != null) {
 				list.add(docentesave);
-
 				response.getDocenteResponse().setDocente(list);
 				response.setMetadata("Respuesta 0k", "000", "Respuesta exitosa");
 			} else {
 				response.setMetadata("Respuesta nok", "000", "Error docente no guardado");
 				return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.BAD_REQUEST);
 			}
-
 		} catch (Exception e) {
 			response.setMetadata("Respuesta nok", "000", "Error al guardar el docente");
 			e.getStackTrace();
 			return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
 		}
-
 		return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.OK);
 	}
 
 	private int usuariosRepetido(String usuario) {
 		int resp = 0;
-
 		List<Usuario> list = new ArrayList<>();
-
 		list = (List<Usuario>) usuarioDao.findAll();
-
 		for (Usuario u : list) {
-
 			if (usuario.equals(u.getNombreUsuario())) {
 				resp = 1;
 			}
 		}
-
 		return resp;
 	}
 
@@ -300,7 +271,6 @@ public class IDocenteServiceImpl implements IDocenteService {
 		try {
 			Optional<Docente> usuarioF = docenteDao.findById(id);
 			if (usuarioF.isPresent()) {
-
 				usuarioF.get().setCodigoDocente(docente.getCodigoDocente());
 				usuarioF.get().setIdDocente(docente.getIdDocente());
 				usuarioF.get().setNombreDocente(docente.getNombreDocente());
@@ -311,7 +281,6 @@ public class IDocenteServiceImpl implements IDocenteService {
 				usuarioF.get().setSexo(docente.getSexo());
 				usuarioF.get().setPuestoTrabajoDocente(docente.getPuestoTrabajoDocente());
 				usuarioF.get().setCorreoDocente(docente.getCorreoDocente());
-				// usuarioF.get().setCodCargo(docente.getCodCargo());
 			} else {
 				response.setMetadata("Respuesta nok", "-1", "No se encontro el usuario");
 				return new ResponseEntity<DocenteResponseRest>(response, HttpStatus.NOT_FOUND);
@@ -333,7 +302,6 @@ public class IDocenteServiceImpl implements IDocenteService {
 				} else
 					cargos.remove(indice);
 			}
-
 			if (cargos.size() > 0) {
 				for (Cargo cargo : cargos) {
 					CargoDocente cargoDocente = new CargoDocente();
