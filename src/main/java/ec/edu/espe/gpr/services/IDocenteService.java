@@ -25,5 +25,5 @@ public interface IDocenteService {
 
 	public ResponseEntity<DocenteResponseRest> serachPorPerfil();
 
-	public void resetearPassword(String email);
+	public void resetearPassword(String email) throws Exception;
 }

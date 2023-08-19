@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import ec.edu.espe.gpr.exceptions.DocenteNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -336,6 +337,9 @@ public class IDocenteServiceImpl implements IDocenteService {
 	public void resetearPassword(String email) {
 		PasswordEncoder passeconder = new BCryptPasswordEncoder();
 		Docente docente = this.docenteDao.findByCorreoDocente(email);
+		if(docente == null){
+			throw new DocenteNotFoundException("Docente no encontrado para el correo: " + email);
+		}
 		String password = this.generateRandomPassword(10);
 		docente.getCodigoUsuario().setPasswUsuario(passeconder.encode(password));
 		docente.getCodigoUsuario().setFechaModUsuario(new Date());

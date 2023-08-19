@@ -5,11 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import ec.edu.espe.gpr.dao.IDocenteDao;
+import ec.edu.espe.gpr.exceptions.DocenteNotFoundException;
 import ec.edu.espe.gpr.model.Cargo;
 import ec.edu.espe.gpr.model.Docente;
 import ec.edu.espe.gpr.response.DocenteResponseRest;
 import ec.edu.espe.gpr.services.IDocenteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -118,6 +120,9 @@ public class DocenteRestController {
 		try {
 			this.docenteservice.resetearPassword(email);
 			return ResponseEntity.ok().build();
+		} catch (DocenteNotFoundException e) {
+			// Manejar la excepción de docente no encontrado y devolver una respuesta de error
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().build();
