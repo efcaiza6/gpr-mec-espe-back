@@ -121,7 +121,6 @@ public class DocenteRestController {
 			this.docenteservice.resetearPassword(email);
 			return ResponseEntity.ok().build();
 		} catch (DocenteNotFoundException e) {
-			// Manejar la excepción de docente no encontrado y devolver una respuesta de error
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
